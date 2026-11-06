@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROXY DUARTE V5</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+  body{background:#0f1720;color:#fff;min-height:100vh;padding:15px;padding-bottom:30px;}
+  .header{display:flex;align-items:center;justify-content:space-between;margin:15px 5px 25px;}
+  .header-left{display:flex;align-items:center;gap:12px;}
+  .logo{width:52px;height:52px;background:linear-gradient(135deg,#1e90ff,#00bfff);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10.5px;text-align:center;line-height:1.1;border:2px solid #2a4a6b;box-shadow:0 0 15px rgba(30,144,255,0.3);}
+  .header-title{font-weight:800;font-size:18px;letter-spacing:0.5px;line-height:1.1}
+  .header-subtitle{font-size:11px;font-weight:900;color:#00e676;letter-spacing:1.2px;margin-top:3px;text-shadow:0 0 8px rgba(0,230,118,0.6);animation:glow 2s infinite}
+  @keyframes glow{0%,100%{opacity:1}50%{opacity:0.7;text-shadow:0 0 15px rgba(0,230,118,0.9)}}
+  .gear{width:48px;height:48px;background:#1c2a3a;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #2d3d50;font-size:22px;cursor:pointer;transition:all .2s}
+  .gear:active{transform:rotate(90deg) scale(0.9)}
+  .section-label{font-size:11px;color:#8a9bb0;letter-spacing:1.5px;font-weight:700;margin:22px 5px 12px;}
+  .card{background:#1a2736;border:1px solid #2d3e52;border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:12px;cursor:pointer;position:relative;overflow:hidden;transition:all .2s ease;user-select:none}
+  .card:active{transform:scale(0.97)}
+  .card-icon{width:56px;height:56px;background:#233447;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;transition:all .3s}
+  .card-title{font-weight:700;font-size:16px;margin-bottom:2px;}
+  .card-desc{font-size:12.5px;color:#8a9bb0;line-height:1.3;}
+  .badge{background:#233447;color:#cbd5e1;font-size:10px;padding:6px 10px;border-radius:8px;font-weight:700;display:flex;align-items:center;gap:4px;transition:all .3s}
+  .status-card.conectado{border-color:#00c853;background:#1a2e26;}
+  .status-card.conectado .card-title{color:#00e676;font-size:17px;font-weight:900;line-height:1.2;}
+  .badge.conectado{background:#00c853;color:#fff;}
+  .func-card.ativado{border-color:#00e676;box-shadow:0 0 20px rgba(0,230,118,0.4);background:linear-gradient(135deg,#1a2e26,#1f3a2d)}
+  .func-card.ativado .card-icon{background:#00c853;animation:pulse 1.5s infinite}
+  .func-card.ativado .card-title{color:#00e676}
+  .func-card.bloqueado{opacity:0.5;pointer-events:none;filter:grayscale(0.6)}
+  .card.iniciar{background:linear-gradient(135deg,#1e3a5f,#234a73);border-color:#2f5a85}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,230,118,0.7)}70%{box-shadow:0 0 0 12px rgba(0,230,118,0)}100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .shake{animation:shake .3s ease}
+  .aviso{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#ff3b30;color:#fff;padding:12px 20px;border-radius:999px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s;z-index:99;text-align:center;min-width:260px}
+  .aviso.show{opacity:1;bottom:30px}
+  .aviso.green{background:#00c853}
+  .canal-card.whatsapp{border-left:3px solid #25D366}
+  .canal-card.whatsapp .card-icon{background:#0f2a1c;color:#25D366}
+  .canal-card.youtube{border-left:3px solid #FF0000}
+  .canal-card.youtube .card-icon{background:#2a1212;color:#FF0000}
+  .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+  .overlay.show{display:flex}
+  .modal{width:100%;max-width:480px;background:#0f1720;border-top:1px solid #2d3e52;border-radius:28px 28px 0 0;max-height:92vh;overflow:hidden;animation:slideUp .35s ease}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-header{padding:20px 18px 0;display:flex;justify-content:space-between;align-items:center}
+  .modal-tabs{display:flex;gap:8px;padding:18px;background:#0f1720}
+  .tab{flex:1;padding:12px;border-radius:14px;text-align:center;font-weight:800;font-size:13px;letter-spacing:1px;cursor:pointer;background:#1a2736;border:1px solid #2d3e52;color:#8a9bb0;transition:all .2s}
+  .tab.active{background:linear-gradient(135deg,#1e90ff,#00bfff);color:#fff;border-color:#1e90ff;box-shadow:0 0 15px rgba(30,144,255,0.4)}
+  .modal-content{padding:15px 15px 30px;overflow-y:auto;max-height:70vh}
+  .close-btn{width:36px;height:36px;background:#1a2736;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid #2d3d50;font-size:18px;cursor:pointer}
+  .info-hero{background:linear-gradient(135deg,#0a1a2a,#102a4a);border:1px solid #1e3a5f;border-radius:24px;padding:25px;text-align:center;position:relative;overflow:hidden}
+  .info-hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(30,144,255,0.15) 0%, transparent 70%);animation:rotate 8s linear infinite}
+  @keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .avatar{width:80px;height:80px;background:linear-gradient(135deg,#1e90ff,#00bfff);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;box-shadow:0 0 30px rgba(30,144,255,0.5);border:3px solid #2a4a6b;position:relative;z-index:1}
+  .creator-name{font-size:20px;font-weight:900;letter-spacing:1px;position:relative;z-index:1}
+  .creator-tag{font-size:11px;color:#00e676;font-weight:800;letter-spacing:2px;margin-top:4px;position:relative;z-index:1}
+  .status-box{display:flex;gap:10px;margin-top:18px;position:relative;z-index:1}
+  .status-item{flex:1;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);border-radius:14px;padding:10px;text-align:center}
+  .status-item b{display:block;color:#00e676;font-size:12px;letter-spacing:1px}
+  .status-item span{font-size:11px;color:#8a9bb0}
+  .dot{width:8px;height:8px;background:#00e676;border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 8px #00e676}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+  .info-details{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .info-card{background:#1a2736;border:1px solid #2d3e52;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px}
+  .info-card-icon{width:40px;height:40px;background:#233447;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  #loginScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#0f1720;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+  .login-box{width:100%;max-width:380px;background:#1a2736;border:1px solid #2d3e52;border-radius:28px;padding:28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .login-logo{width:80px;height:80px;background:linear-gradient(135deg,#1e90ff,#00bfff);border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;line-height:1.1;border:3px solid #2a4a6b;box-shadow:0 0 25px rgba(30,144,255,0.4)}
+  .login-title{font-weight:900;font-size:22px;letter-spacing:1px}
+  .login-sub{font-size:11px;color:#00e676;font-weight:800;letter-spacing:1.5px;margin:6px 0 20px}
+  .input-group{position:relative;margin:16px 0}
+  .login-input{width:100%;background:#0f1720;border:1px solid #2d3e52;border-radius:14px;padding:14px 14px 14px 45px;color:#fff;font-size:14px;outline:none;transition:all .2s;text-transform:uppercase}
+  .login-input:focus{border-color:#1e90ff;box-shadow:0 0 0 3px rgba(30,144,255,0.2)}
+  .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:0.6}
+  .btn-login{width:100%;background:linear-gradient(135deg,#1e90ff,#00bfff);border:none;border-radius:14px;padding:14px;color:#fff;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:10px;transition:all .2s}
+  .btn-login:active{transform:scale(0.97)}
+  .login-error{background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.3);color:#ff3b30;border-radius:12px;padding:10px;font-size:12px;font-weight:600;margin-top:12px;display:none}
+  .login-error.show{display:block}
+  .login-success{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;border-radius:12px;padding:10px;font-size:12px;font-weight:600;margin-top:12px;display:none}
+  .login-success.show{display:block}
+  #mainContent{display:none}
+  #mainContent.show{display:block}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">PROXY<br>DUARTE</div>
+    <div class="login-title">PROXY DUARTE V5</div>
+    <div class="login-sub">● PROXY ONLINE VIA SITE ●</div>
+    <div style="background:#0f1720;border:1px solid #1e3a5f;border-radius:14px;padding:10px;margin:14px 0">
+      <div style="font-size:10px;color:#8a9bb0;font-weight:700">🔒 ACESSO RESTRITO - KEY EXCLUSIVA</div>
+    </div>
+    <div class="input-group">
+      <div class="input-icon">🔑</div>
+      <input type="text" id="keyInput" class="login-input" placeholder="DIGITE SUA KEY" autocomplete="off" spellcheck="false">
+    </div>
+    <button class="btn-login" id="btnLogin" onclick="fazerLogin()">🔓 DESBLOQUEAR ACESSO</button>
+    <div id="loginError" class="login-error"></div>
+    <div id="loginSuccess" class="login-success"></div>
+    <div style="margin-top:18px;font-size:10px;color:#4a5a6b;letter-spacing:1px">© 2026 DUARTE MODDER OFC • SISTEMA PROTEGIDO</div>
+  </div>
+</div>
+
+<div id="mainContent">
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">PROXY<br>DUARTE</div>
+      <div>
+        <div class="header-title">PROXY DUARTE V5</div>
+        <div class="header-subtitle">● PROXY ONLINE VIA SITE</div>
+      </div>
+    </div>
+    <div class="gear" onclick="abrirModal()">⚙️</div>
+  </div>
+
+  <div id="telaPrincipal">
+    <div class="section-label">STATUS DO DISPOSITIVO</div>
+    <div class="card status-card conectado" style="cursor:default">
+      <div class="card-icon">✅</div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:flex-start;">
+          <div class="card-title">DISPOSITIVO CONECTADO<br>SITE ONLINE</div>
+          <div class="badge conectado">✦ CONECTADO</div>
+        </div>
+        <div class="card-desc" style="margin-top:6px;color:#7fdb9f">Conexão ativa • Servidor online</div>
+      </div>
+    </div>
+
+    <div class="section-label">AÇÕES</div>
+    <div class="card func-card" id="func1" onclick="toggleFunc('func1')">
+      <div class="card-icon" id="icon1">🎯</div>
+      <div style="flex:1"><div class="card-title">AIM HEAD</div><div class="card-desc" id="desc1">Toque para ativar</div></div>
+      <div class="badge" id="badge1">DESATIVADO</div><div style="font-size:20px;color:#8a9bb0">→</div>
+    </div>
+    <div class="card func-card" id="func2" onclick="toggleFunc('func2')">
+      <div class="card-icon" id="icon2">👁️</div>
+      <div style="flex:1"><div class="card-title">AIM HEAD+ESP</div><div class="card-desc" id="desc2">Toque para ativar</div></div>
+      <div class="badge" id="badge2">DESATIVADO</div><div style="font-size:20px;color:#8a9bb0">→</div>
+    </div>    <div class="card iniciar" id="btnProxy" onclick="iniciarProxy()">
+      <div class="card-icon">▶️</div>
+      <div style="flex:1"><div class="card-title">Iniciar Proxy</div><div class="card-desc" id="descProxy">Selecione AIM HEAD primeiro</div></div>
+      <div style="font-size:20px;color:#8a9bb0">→</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <div class="section-label" style="margin-bottom:0">CANAIS E ATUALIZAÇÕES</div>
+      <div class="section-label" style="margin-bottom:0;opacity:0.6;font-size:9px">PROXY DUARTE V5</div>
+    </div>
+    <div class="card canal-card whatsapp" onclick="abrirCanal('whatsapp')">
+      <div class="card-icon">💬</div>
+      <div style="flex:1"><div class="card-title" style="font-size:14px">Canal Oficial - WhatsApp</div><div class="card-desc">Entre no canal • Novidades e atualizações</div></div>
+      <div style="font-size:20px;color:#25D366">›</div>
+    </div>
+    <div class="card canal-card youtube" onclick="abrirCanal('youtube')">
+      <div class="card-icon">▶️</div>
+      <div style="flex:1"><div class="card-title" style="font-size:14px">Canal Oficial - YouTube</div><div class="card-desc">Se inscreva • Tutoriais e novidades</div></div>
+      <div style="font-size:20px;color:#FF0000">›</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="fecharModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="logo" style="width:38px;height:38px;font-size:8px">PROXY<br>DUARTE</div>
+          <div><div style="font-weight:800;font-size:14px">PROXY DUARTE V5</div><div style="font-size:10px;color:#00e676;font-weight:700">CONFIGURAÇÕES</div></div>
+        </div>
+        <div class="close-btn" onclick="fecharModal()">✕</div>
+      </div>
+      <div class="modal-tabs">
+        <div class="tab active" id="tabAIM" onclick="trocarAba('AIM')">⚡ AIM</div>
+        <div class="tab" id="tabINFO" onclick="trocarAba('INFO')">ℹ️ INFO</div>
+      </div>
+      <div class="modal-content">
+        <div id="conteudoAIM">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:40px;margin-bottom:10px">⚡</div>
+            <div style="font-weight:800;font-size:16px">ABA PRINCIPAL ATIVA</div>
+            <div style="font-size:12px;color:#8a9bb0;margin-top:6px">Você já está na tela AIM principal.<br>Feche esta janela para usar as funções.</div>
+            <div class="card iniciar" style="margin-top:20px" onclick="fecharModal()"><div class="card-icon">✅</div><div style="flex:1"><div class="card-title">Voltar para AIM</div><div class="card-desc">Fechar configurações</div></div><div>→</div></div>
+          </div>
+        </div>
+        <div id="conteudoINFO" style="display:none">
+          <div class="info-hero">
+            <div class="avatar">DM</div>
+            <div class="creator-name">DUARTE MODDER OFC</div>
+            <div class="creator-tag"><span class="dot"></span> CRIADOR OFICIAL • VERIFICADO</div>
+            <div class="status-box">
+              <div class="status-item"><b><span class="dot"></span> ONLINE</b><span>STATUS</span></div>
+              <div class="status-item"><b>V5.0</b><span>VERSÃO</span></div>
+              <div class="status-item"><b>2026</b><span>ATUALIZADO</span></div>
+            </div>
+          </div>
+          <div class="info-details">
+            <div class="info-card"><div class="info-card-icon">👑</div><div><div style="font-weight:700;font-size:13px">Criado por</div><div style="font-size:12px;color:#8a9bb0">DUARTE MODDER OFC - Desenvolvedor oficial</div></div></div>
+            <div class="info-card"><div class="info-card-icon" style="color:#00e676">🟢</div><div><div style="font-weight:700;font-size:13px">STATUS: ONLINE</div><div style="font-size:12px;color:#00e676">Servidor operacional • Proxy ativo via site</div></div></div>
+            <div class="info-card"><div class="info-card-icon">🛡️</div><div><div style="font-weight:700;font-size:13px">Segurança Máxima</div><div style="font-size:12px;color:#8a9bb0">Conexão criptografada e protegida</div></div></div>
+          </div>
+          <div style="margin-top:18px;text-align:center"><div style="font-size:10px;color:#4a5a6b;letter-spacing:2px">© 2026 DUARTE MODDER OFC</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="aviso" id="aviso"></div>
+</div>
+
+<script>
+function getSecretKey(){
+  const b64 = "RFVBUlRFLVdXU1QtT05MSU5F";
+  try{ return atob(b64); }catch(e){ return ""; }
+}
+window.onload = () => {
+  const salvo = localStorage.getItem('proxy_duarte_auth');
+  if(salvo === "autenticado_v5_duarte"){ liberarAcesso(); }
+};
+function fazerLogin(){
+  const input = document.getElementById('keyInput');
+  const key = input.value.trim().toUpperCase();
+  const btn = document.getElementById('btnLogin');
+  const error = document.getElementById('loginError');
+  const success = document.getElementById('loginSuccess');
+  error.classList.remove('show'); success.classList.remove('show');
+  if(!key){ error.textContent = "⚠️ Digite sua KEY!"; error.classList.add('show'); return; }
+  btn.textContent = "⏳ VERIFICANDO..."; btn.disabled = true;
+  const secret = getSecretKey();
+  if(key === secret){
+    success.textContent = "✅ KEY CORRETA! Liberando...";
+    success.classList.add('show');
+    localStorage.setItem('proxy_duarte_auth', "autenticado_v5_duarte");
+    setTimeout(()=>{ liberarAcesso(); }, 800);
+  } else {
+    error.textContent = "❌ KEY INVÁLIDA!";
+    error.classList.add('show');
+    btn.textContent = "🔓 DESBLOQUEAR ACESSO";
+    btn.disabled = false;
+  }
+}
+function liberarAcesso(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainContent').classList.add('show');
+  document.body.style.padding = "15px";
+  mostrarAviso("✅ Acesso liberado!", "green");
+}
+document.getElementById('keyInput')?.addEventListener('keypress', (e)=>{ if(e.key === 'Enter') fazerLogin(); });
+
+const LINKS = {
+  func1: "https://www.mediafire.com/file/lt79vxx1ug3q379/AIM+HEAD+ONLINE.zip/file",
+  func2: "https://www.mediafire.com/file/elho44t46rdmjkn/AIM+HEAD+ESP+ONLINE.zip/file",
+  whatsapp: "https://whatsapp.com/channel/0029VbDlssb4dTnOOA3MXj0c",
+  youtube: "https://www.youtube.com/@DUARTE_MODDER"
+};
+const NOMES = { func1: "AIM HEAD", func2: "AIM HEAD+ESP" };
+let ativa = null;
+function abrirModal(){document.getElementById('overlay').classList.add('show'); document.body.style.overflow='hidden'}
+function fecharModal(e){if(!e || e.target.id==='overlay' || e.target.className==='close-btn'){document.getElementById('overlay').classList.remove('show'); document.body.style.overflow='auto'}}
+function trocarAba(nome){
+  document.getElementById('tabAIM').classList.remove('active'); document.getElementById('tabINFO').classList.remove('active');
+  document.getElementById('conteudoAIM').style.display='none'; document.getElementById('conteudoINFO').style.display='none';
+  document.getElementById('tab'+nome).classList.add('active'); document.getElementById('conteudo'+nome).style.display='block';
+}
+function mostrarAviso(texto, cor='red'){
+  const aviso = document.getElementById('aviso'); aviso.textContent = texto;
+  aviso.className = 'aviso show' + (cor==='green' ? ' green' : '');
+  setTimeout(()=>aviso.classList.remove('show'),2500);
+}
+function abrirCanal(tipo){ mostrarAviso('🚀 Abrindo ' + tipo.toUpperCase(), 'green'); setTimeout(()=>window.open(LINKS[tipo], '_blank'),500); }
+function toggleFunc(id){
+  const card = document.getElementById(id);
+  const num = id.replace('func','');
+  const icon = document.getElementById('icon'+num);
+  const badge = document.getElementById('badge'+num);
+  const desc = document.getElementById('desc'+num);
+  const outraId = id === 'func1' ? 'func2' : 'func1';
+  const outraCard = document.getElementById(outraId);
+  const descProxy = document.getElementById('descProxy');
+  if(card.classList.contains('ativado')){
+    card.classList.remove('ativado'); badge.textContent = 'DESATIVADO'; badge.style.background = '#233447'; desc.textContent = 'Toque para ativar'; icon.textContent = num==='1' ? '🎯' : '👁️'; ativa = null; outraCard.classList.remove('bloqueado'); descProxy.textContent = 'Selecione AIM HEAD primeiro'; return;
+  }
+  if(ativa && ativa !== id){ mostrarAviso('⚠️ Desative '+NOMES[ativa]+' primeiro!'); card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),1500); return; }
+  badge.textContent = 'ATIVANDO...'; icon.textContent = '⏳';
+  setTimeout(()=>{ card.classList.add('ativado'); badge.textContent = 'ATIVADO'; desc.textContent = NOMES[id]+' em execução • ON'; icon.textContent = '✅'; ativa = id; outraCard.classList.add('bloqueado'); descProxy.textContent = 'Pronto para '+NOMES[id]+' → Iniciar'; mostrarAviso('✅ '+NOMES[id]+' ativado!', 'green'); },400);
+}
+function iniciarProxy(){
+  const card = document.getElementById('btnProxy');
+  if(!ativa){ mostrarAviso('⚠️ Ative AIM HEAD ou AIM HEAD+ESP primeiro!'); card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),1000); return; }
+  const descProxy = document.getElementById('descProxy'); descProxy.textContent = 'Iniciando Proxy...'; card.style.opacity = '0.7';
+  mostrarAviso('🚀 Iniciando com ' + NOMES[ativa], 'green');
+  setTimeout(()=>{ window.open(LINKS[ativa], '_blank'); descProxy.textContent = 'Pronto para '+NOMES[ativa]+' → Iniciar'; card.style.opacity = '1'; },800);
+}
+</script>
+</body>
+</html>
